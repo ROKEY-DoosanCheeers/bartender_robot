@@ -1,8 +1,8 @@
 import rclpy
 from rclpy.node import Node
 import DR_init
-from robot_arm import RobotArm
-from robot_actions.garnish import GarnishAction
+from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
+from utils.garnish import GarnishAction
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
 
 def get_recipes(arm):
