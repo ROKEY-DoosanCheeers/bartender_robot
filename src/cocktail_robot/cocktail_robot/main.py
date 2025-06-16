@@ -3,22 +3,25 @@ from rclpy.node import Node
 import DR_init
 from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from utils.garnish import GarnishAction
+from stir.shaker_action import ShakerAction
+from stir.shaker_pour import PourAction    
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
 
 def get_recipes(arm):
     return {
         'Margarita': [
+            ShakerAction(arm)
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
             # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
-            GarnishAction(arm, "lime"),
+            # GarnishAction(arm, "lime"),
             # PlateAction(arm)
         ],
         'China Red': [
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
             # PourAction(arm, "red_juice", 30, pose="pour_red"),
             # ShakeAction(arm, pose="shake_zone", cycles=5),
-            GarnishAction(arm, "cherry"),
+            # GarnishAction(arm, "cherry"),
             # PlateAction(arm)
         ]
     }
@@ -29,7 +32,7 @@ def main():
     recipes = get_recipes(arm)
     print("가능한 칵테일:", list(recipes.keys()))
 
-    cocktail = input("만들 칵테일을 입력하세요: ")
+    cocktail = 'Margarita'
     if cocktail not in recipes:
         print("해당 레시피가 없습니다.")
         return
