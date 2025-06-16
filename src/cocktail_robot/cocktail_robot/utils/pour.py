@@ -4,24 +4,13 @@ from .base_action import BaseAction
 from DR_common2 import posx
 
 class PourAction(BaseAction):
-    POSE_MAP = {
-        "pour_tequila": posx([0, 0, 0, 0, 0, 0]),
-        "pour_blue":    posx([0, 0, 0, 0, 0, 0]),
-        "pour_red":     posx([0, 0, 0, 0, 0, 0]),
-    }
-
-
-    def __init__(self, arm, ingredient, amount, pose):
+    def __init__(self, arm, ingredient, amount, pose_dict):     # pose_dict로 location.yaml 파일을 불러옴
         self.arm = arm
         self.ingredient = ingredient
         self.amount = amount
-        self.pose_name = pose
+        self.task_pose = pose_dict["task"]  # task 좌표
+        self.joint_pose = pose_dict["joint"] # joint 좌표 선언
 
     def execute(self):
-        pose = self.POSE_MAP.get(self.pose_name)
-
-        if pose is None:
-            print(f"[PourAction] 정의되지 않은 pose: {self.pose_name}")
-            return
-        
-        self.arm.movel(pose)
+        self.arm.movel(self.task_pose)  # movel task 수행
+        self.arm.movej(self.joint_pose) # movej joint 수행
