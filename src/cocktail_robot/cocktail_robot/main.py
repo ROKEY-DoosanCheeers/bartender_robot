@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
-from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
+# from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
 
 from DR_common2 import posx, posj
@@ -11,7 +11,7 @@ from DR_common2 import posx, posj
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
 
-ROBOT_ID = "dsr01"
+ROBOT_ID = ''#"dsr01"
 ROBOT_MODEL = "m0609"
 VELOCITY, ACC = 60, 60
 
@@ -28,7 +28,6 @@ def get_recipes(node, poses):
             # ShakeAction(arm, pose="shake_zone", cycles=7),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
-            StirAction(node, poses['stir'])
         ],
         'China Red': [
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
@@ -36,16 +35,18 @@ def get_recipes(node, poses):
             # ShakeAction(arm, pose="shake_zone", cycles=5),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
+        ],
+        'test': [
+            StirAction(node, poses['stir'])
         ]
     }
 
 
 def main():
     rclpy.init()
-    node = rclpy.create_node("force_control", namespace=ROBOT_ID)
+    node = rclpy.create_node("main", namespace=ROBOT_ID)
     DR_init.__dsr__node = node
 
-    # arm = RobotArm()    
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
@@ -58,6 +59,7 @@ def main():
     print(f"\n[{cocktail}] 제조 시작!")
     for idx, action in enumerate(recipes[cocktail], 1):
         action.execute()
+
     rclpy.shutdown()
 
 
