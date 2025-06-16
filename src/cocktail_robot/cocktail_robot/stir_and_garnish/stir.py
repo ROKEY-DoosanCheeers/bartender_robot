@@ -4,7 +4,7 @@ import time
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 60, 60
+VELOCITY, ACCURACY = 70, 60
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
@@ -21,8 +21,6 @@ class StirAction(BaseAction):
                 release_force,
                 release_compliance_ctrl,
                 set_digital_output,
-                set_tool,
-                set_tcp,
                 move_periodic,
                 movej,
                 movel,
@@ -53,14 +51,24 @@ class StirAction(BaseAction):
         self.set_digital_output = set_digital_output
         
     def execute(self):
-        self.movej(pos=self.stir_pose["spoon_grasp_0"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        self.movej(self.stir_pose["spoon_grasp_1"]["joint"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
+        self.movel(self.stir_pose["spoon_grasp_1"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
         self.grasp(self.grasp_option)
+        print('hh')
         self.movel(pos=[0,0,160,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
-        self.movej(self.stir_pose["stir"]["joint"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
+        self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
         self.down_stir_up()
-        self.movej(self.stir_pose["spoon_grasp_1"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        self.movej(self.stir_pose["spoon_grasp_0"]["joint"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
+        self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
+        # self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
+        print('hh')
 
     def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
         k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
