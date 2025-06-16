@@ -68,15 +68,17 @@ class RobotArm(Node):
         move_periodic(amp, period, repeat, ref, **kwargs)
 
 
-    def grasp(self):
+    def grasp(self, x):
+        self._set_custom_grasp(x)
         set_digital_output(1, ON)
         wait(0.5)
 
-    def release(self):
+    def release(self, x):
+        self._set_custom_grasp(x)
         set_digital_output(1, OFF)
         wait(0.5)
 
-    def set_custom_grip(self, x):
+    def _set_custom_grasp(self, x):
         if x == 0:
             set_digital_output(2, OFF)
         elif x == 1:
