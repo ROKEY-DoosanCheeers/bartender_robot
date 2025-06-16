@@ -18,13 +18,13 @@ class StirAction(BaseAction):
         self.arm.movej(self.stir_pose["spoon_grasp_1"]["joint"])
         self.arm.grasp()
         self.arm.movel(pos=[0,0,160,0,0,0], mod=DR_MV_MOD_REL, ref=DR_BASE)
-        self.arm.movej(self.stir_pose["stir"]["joint"]) ##### pos before put in
+        self.arm.movej(self.stir_pose["stir"]["joint"])
         self.down_stir_up()
         self.arm.movej(self.stir_pose["spoon_grasp_1"]["joint"])
         self.arm.movej(self.stir_pose["spoon_grasp_0"]["joint"])
 
 
-    def down_stir_up(self, target_pos, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
+    def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
         k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
         f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
         f_dir = [0, 0, 1, 0, 0, 0]
@@ -33,11 +33,13 @@ class StirAction(BaseAction):
         self.arm.set_desired_force(f_d, f_dir)
 
         while True:
-            if self.arm.check_position_condition(axis=DR_AXIS_Z, max=target_pos, ref=DR_BASE):
-                self.arm.stop(st_mode=DR_QSTOP)
+            if not self.arm.check_position_condition(axis=DR_AXIS_Z, max=target_pos, ref=DR_BASE):
+                time.sleep(0.5)
                 self.arm.release_force(time=0.5)
                 self.arm.release_compliance_ctrl()
-                break          
+                break       
+            else:
+                pass   
                 
         self.arm.move_periodic(
             amp=[turning_radius, turning_radius, 0, 0, 0, 0],
