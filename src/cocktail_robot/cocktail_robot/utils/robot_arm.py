@@ -13,16 +13,21 @@ ON, OFF = 1, 0
 
 
 try:
-    from DSR_ROBOT2 import set_tool, set_tcp, set_digital_output, get_digital_input, movej, movel
+    from DSR_ROBOT2 import (set_tool, set_tcp,
+                            set_digital_output, # get_digital_input,
+                            task_compliance_ctrl, set_desired_force, check_force_condition, check_position_condition,
+                            release_force, release_compliance_ctrl,
+                            move_periodic,
+                            wait, movej, movel)
     from DR_common2 import posx, posj
 except ImportError as e:
     print(f"Error importing DSR_ROBOT2: {e}")
 
-def wait_digital_input(sig_num):
-        while not get_digital_input(sig_num):
-            time.sleep(0.5)
-            print(f"Wait for digital input: {sig_num}")
-            pass
+# def wait_digital_input(sig_num):
+#         while not get_digital_input(sig_num):
+#             time.sleep(0.5)
+#             print(f"Wait for digital input: {sig_num}")
+#             pass
 
 
 class RobotArm(Node):
@@ -34,37 +39,51 @@ class RobotArm(Node):
         set_tool("Tool Weighttest")
         set_tcp("GripperDA_v2")
 
+    def movej(self, pose, **kwargs):
+        movej(pose, vel=VELOCITY, acc=ACC, **kwargs)
 
-    def movej(self, pose):
-        movej(pose, vel=VELOCITY, acc=ACC)
+    def movel(self, pose, **kwargs):
+        movel(pose, vel=VELOCITY, acc=ACC, **kwargs)
 
-    def movel(self, pose):
-        movel(pose, vel=VELOCITY, acc=ACC)
+
+    def task_compliance_ctrl(self, stx):
+        task_compliance_ctrl(stx)
+
+    def set_desired_force(self, fd, f_dir):
+        set_desired_force(fd, f_dir)
+
+    def check_force_condition(self, axis, ref, **kwargs):
+        check_force_condition(axis, ref, **kwargs)
+
+    def check_position_condition(self, axis, **kwargs):
+        check_position_condition(axis, **kwargs)
+
+    def release_force(self, time):
+        release_force(time)
+
+    def release_compliance_ctrl(self):
+        release_compliance_ctrl()
+
+    def move_periodic(self, amp, period, repeat, ref, **kwargs):
+        move_periodic(amp, period, repeat, ref, **kwargs)
+
 
     def grasp(self):
         set_digital_output(1, ON)
-        set_digital_output(2, OFF)
-        wait_digital_input(1)
+        wait(0.5)
 
     def release(self):
-        set_digital_output(2, ON)
         set_digital_output(1, OFF)
-        wait_digital_input(2)
+        wait(0.5)
 
     def set_custom_grip(self, x):
         if x == 0:
-            set_digital_output(3, OFF)
-            set_digital_output(4, OFF)
+            set_digital_output(2, OFF)
         elif x == 1:
-            set_digital_output(3, OFF)
-            set_digital_output(4, ON)
-        elif x == 2:
-            set_digital_output(3, ON)
-            set_digital_output(4, OFF)
-        elif x == 3:
-            set_digital_output(3, ON)
-            set_digital_output(4, ON)
+            set_digital_output(2, ON)
 
+    def stop(self):
+        pass
         
     def emergency_stop(self):
         pass
