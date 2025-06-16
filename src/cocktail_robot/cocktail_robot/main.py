@@ -4,13 +4,10 @@ import DR_init
 import os, yaml
 from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from utils.garnish import GarnishAction
-<<<<<<< HEAD
-from stir.shaker_action import ShakerAction
-from stir.shaker_pour import PourAction    
-=======
+from shaker.shaker_action import ShakerAction
+from shaker.shaker_pour import PourAction    
 
 from DR_common2 import posx, posj
->>>>>>> 03872ae2a0f082a4fda7bf3cec19b336f15dcc4e
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -30,29 +27,18 @@ def load_yaml(POSE_PATH):
 def get_recipes(arm, poses):
     return {
         'Margarita': [
-<<<<<<< HEAD
-            ShakerAction(arm)
+            ShakerAction(arm,poses["shaker"])
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
             # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
             # GarnishAction(arm, "lime"),
-=======
-            # PourAction(arm, "tequila", 50, poses["pour_tequila"]),
-            # PourAction(arm, "blue_juice", 20, poses["pour_tequila"]),
-            # ShakeAction(arm, pose="shake_zone", cycles=7),
-            GarnishAction(arm, poses["garnish"]),
->>>>>>> 03872ae2a0f082a4fda7bf3cec19b336f15dcc4e
             # PlateAction(arm)
         ],
         'China Red': [
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
             # PourAction(arm, "red_juice", 30, pose="pour_red"),
             # ShakeAction(arm, pose="shake_zone", cycles=5),
-<<<<<<< HEAD
-            # GarnishAction(arm, "cherry"),
-=======
             GarnishAction(arm, poses["garnish"]),
->>>>>>> 03872ae2a0f082a4fda7bf3cec19b336f15dcc4e
             # PlateAction(arm)
         ]
     }

@@ -16,9 +16,10 @@ try:
     from DSR_ROBOT2 import (set_tool, set_tcp,
                             set_digital_output, # get_digital_input,
                             task_compliance_ctrl, set_desired_force, check_force_condition, check_position_condition,
+                            amove_periodic,
                             release_force, release_compliance_ctrl,
                             move_periodic,
-                            wait, movej, movel)
+                            wait, movej, movel,DR_TOOL)
     from DR_common2 import posx, posj
 except ImportError as e:
     print(f"Error importing DSR_ROBOT2: {e}")
@@ -87,3 +88,5 @@ class RobotArm(Node):
         
     def emergency_stop(self):
         pass
+    def amove_periodic(self,amp,period):
+        amove_periodic(amp=amp, period=period, atime=0.02, repeat=10, ref=DR_TOOL)
