@@ -1,5 +1,5 @@
 .vscode/
-log/
-build/
-install/
+log
+build
+install
 **/pycache/**
