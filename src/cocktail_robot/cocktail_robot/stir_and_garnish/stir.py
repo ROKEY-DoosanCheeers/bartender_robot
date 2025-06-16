@@ -53,23 +53,14 @@ class StirAction(BaseAction):
         self.set_digital_output = set_digital_output
         
     def execute(self):
-        print(1)
         self.movej(pos=self.stir_pose["spoon_grasp_0"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        print(2)
         self.movej(self.stir_pose["spoon_grasp_1"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        print(3)
         self.grasp(self.grasp_option)
-        print(4)
         self.movel(pos=[0,0,160,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
-        print(5)
         self.movej(self.stir_pose["stir"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        print(6)
         self.down_stir_up()
-        print(7)
         self.movej(self.stir_pose["spoon_grasp_1"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        print(8)
         self.movej(self.stir_pose["spoon_grasp_0"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        print(9)
 
     def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
         k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
