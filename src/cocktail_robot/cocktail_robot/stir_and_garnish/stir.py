@@ -14,15 +14,14 @@ class StirAction(BaseAction):
         self.stir_pose = stir_pose
 
     def execute(self):
-        self.arm.movej(self.stir_pose["spoon_grasp_0"])
-        self.arm.movej(self.stir_pose["spoon_grasp_1"])
+        self.arm.movej(self.stir_pose["spoon_grasp_0"]["joint"])
+        self.arm.movej(self.stir_pose["spoon_grasp_1"]["joint"])
         self.arm.grasp()
         self.arm.movel(pos=[0,0,160,0,0,0], mod=DR_MV_MOD_REL, ref=DR_BASE)
-        self.arm.movej(self.stir_pose["stir"]) ##### pos before put in
+        self.arm.movej(self.stir_pose["stir"]["joint"]) ##### pos before put in
         self.down_stir_up()
-        self.arm.movej(self.stir_pose["spoon_grasp_1"])
-        self.arm.movej(self.stir_pose["spoon_grasp_0"])
-
+        self.arm.movej(self.stir_pose["spoon_grasp_1"]["joint"])
+        self.arm.movej(self.stir_pose["spoon_grasp_0"]["joint"])
 
 
     def down_stir_up(self, target_pos, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
@@ -44,7 +43,7 @@ class StirAction(BaseAction):
             amp=[turning_radius, turning_radius, 0, 0, 0, 0],
             period=[1, 1, 0, 0, 0, 0],
             repeat=stir_repeat,
-            ref=DR_TOOL
+            ref=DR_BASE
             )
         
         self.arm.movej(pos=posx(0,0,100,0,0,0), ref=DR_BASE, mod=DR_MV_MOD_REL)
