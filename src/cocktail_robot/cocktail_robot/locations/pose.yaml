@@ -1,0 +1,13 @@
+pour_tequila:
+  task : [0, 0, 0, 0, 0, 0]
+  joint: [0, 0, 0, 0, 0, 0]
+  
+pour_blue:
+  task : [0, 0, 0, 0, 0, 0]
+  joint: [0, 0, 0, 0, 0, 0]
+
+shake:
+  discord_name:
+    task : [0, 0, 0, 0, 0, 0]
+    joint: [0, 0, 0, 0, 0, 0]
+---
