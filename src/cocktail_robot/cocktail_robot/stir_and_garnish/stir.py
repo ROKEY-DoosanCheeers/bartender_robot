@@ -52,23 +52,15 @@ class StirAction(BaseAction):
         
     def execute(self):
         self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('m0')
         self.movel(self.stir_pose["spoon_grasp_1"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('m1')
         self.grasp(self.grasp_option)
-        print('grasp')
         self.movel(pos=[0,0,160,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
-        print('mu')
         self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
         self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('stirpos')
         self.down_stir_up()
         self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('stirpos after stir')
         self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('m0')
-        # self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('done')
+
 
     def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
         k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
