@@ -33,7 +33,7 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            ShakerAction(arm,poses["shake"])
+            ShakerAction(node,poses["shake"])
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
             # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
             # ShakeAction(arm, pose="shake_zone", cycles=7),

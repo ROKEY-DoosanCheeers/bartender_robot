@@ -1,6 +1,5 @@
 # 예시 코드
 from ..utils.base_action import BaseAction
-from DR_common2 import posx
 
 class PourAction(BaseAction):
     def __init__(self, arm, poses):
