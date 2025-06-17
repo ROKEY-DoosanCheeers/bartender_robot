@@ -86,9 +86,9 @@ class StirAction(BaseAction):
         self.task_compliance_ctrl(k_d)
         self.set_desired_force(f_d, f_dir)
 
-        # while not self.check_position_condition(axis=self.DR_AXIS_Z, max=target_pos, ref=self.DR_BASE):
-        #     time.sleep(0.5)
-        #     pass
+        while not self.check_position_condition(axis=self.DR_AXIS_Z, max=target_pos, ref=self.DR_BASE):
+            time.sleep(0.5)
+            pass
 
         self.release_force(time=0.5)
         self.release_compliance_ctrl()
