@@ -4,6 +4,7 @@ import DR_init
 import os, yaml
 # from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
+from .stir_and_garnish.garnish import GarnishAction
 
 from DR_common2 import posx, posj
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
@@ -38,7 +39,8 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir'])
+            StirAction(node, poses['stir']),
+            GarnishAction(node, poses['garnish'], "lime")
         ]
     }
 
