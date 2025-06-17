@@ -4,13 +4,12 @@ import time
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 70, 60
+VELOCITY, ACCURACY = 100, 60
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
     def __init__(self, node, stir_pose):
         DR_init.__dsr__node = node
-        print('initialized')
         try:
             from DSR_ROBOT2 import (
                 release_compliance_ctrl,
@@ -27,6 +26,7 @@ class StirAction(BaseAction):
                 DR_MV_MOD_REL,
                 DR_AXIS_Z,
                 DR_BASE,
+                set_ref_coord
             )
             from DR_common2 import posx
 
@@ -49,36 +49,50 @@ class StirAction(BaseAction):
         self.release_compliance_ctrl = release_compliance_ctrl
         self.move_periodic = move_periodic
         self.set_digital_output = set_digital_output
+        self.set_ref_coord = set_ref_coord
         
     def execute(self):
-        self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        self.movel(self.stir_pose["spoon_grasp_1"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(pos=self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        # print('ready')
+        self.movel(self.stir_pose["spoon_grasp_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(self.stir_pose["spoon_grasp"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(pos=[0,-30,0,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
+        # print('grasp position')
         self.grasp(self.grasp_option)
-        self.movel(pos=[0,0,160,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
-        self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        self.down_stir_up()
-        self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
+        # print('grasp')
+        self.movel(pos=[0,0,200,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
+        # print('grasp up')
+        self.movel(pos=self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)        
+        self.movej(self.stir_pose["stir"]["joint"], vel=VELOCITY, acc = ACCURACY)
+        # print('stir position')
+        self.down_stir()
+        # print('stir')
+        self.movej(self.stir_pose["stir"]["joint"], vel=VELOCITY, acc = ACCURACY)
+        # print('stir up')
+        self.movel(self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(self.stir_pose["spoon_drop"]["task"], vel=VELOCITY, acc = ACCURACY)
+        self.movel(pos=[0,0,-200,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
+        self.release(self.grasp_option)
+        self.movel(pos=self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        # print('go back')
 
 
-    def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
-        k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
+    def down_stir(self, target_pos=336.4, turning_radius=10, stir_repeat=4, force_desired=55):
+        self.set_ref_coord(self.DR_BASE)
+        k_d = [5, 5, 50, 100, 100, 100] ## need to check
         f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
         f_dir = [0, 0, 1, 0, 0, 0]
         
         self.task_compliance_ctrl(k_d)
         self.set_desired_force(f_d, f_dir)
 
-        while True:
-            if not self.check_position_condition(axis=self.DR_AXIS_Z, max=target_pos, ref=self.DR_BASE):
-                time.sleep(0.5)
-                self.release_force(time=0.5)
-                self.release_compliance_ctrl()
-                break       
-            else:
-                pass   
-                
+        # while not self.check_position_condition(axis=self.DR_AXIS_Z, max=target_pos, ref=self.DR_BASE):
+        #     time.sleep(0.5)
+        #     pass
+
+        self.release_force(time=0.5)
+        self.release_compliance_ctrl()
+
         self.move_periodic(
             amp=[turning_radius, turning_radius, 0, 0, 0, 0],
             period=[1, 1, 0, 0, 0, 0],

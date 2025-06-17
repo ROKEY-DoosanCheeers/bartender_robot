@@ -48,6 +48,22 @@ def main():
     node = rclpy.create_node("main", namespace=ROBOT_ID)
     DR_init.__dsr__node = node
 
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+    
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
