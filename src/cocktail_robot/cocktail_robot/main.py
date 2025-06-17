@@ -2,15 +2,14 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
-# from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
+from ament_index_python.packages import get_package_share_directory
 
-from DR_common2 import posx, posj
-# 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
+POSE_PATH = os.path.join(
+    get_package_share_directory("cocktail_robot"),
+    "pose.yaml"
+)
 
 ROBOT_ID = "dsr01" # for rviz
 # ROBOT_ID = "" # for moveit
@@ -33,6 +32,7 @@ def get_recipes(node, poses):
         ],
         'China Red': [
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
+
             # PourAction(arm, "red_juice", 30, pose="pour_red"),
             # ShakeAction(arm, pose="shake_zone", cycles=5),
             # GarnishAction(arm, poses["garnish"]),
@@ -40,7 +40,7 @@ def get_recipes(node, poses):
         ],
         'test': [
             StirAction(node, poses['stir']),
-            GarnishAction(node, poses['garnish'], "lime")
+            # GarnishAction(node, poses['garnish'], "lime")
         ]
     }
 
