@@ -52,23 +52,23 @@ class StirAction(BaseAction):
         
     def execute(self):
         self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('m0')
         self.movel(self.stir_pose["spoon_grasp_1"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('m1')
         self.grasp(self.grasp_option)
-        print('hh')
+        print('grasp')
         self.movel(pos=[0,0,160,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=self.DR_MV_MOD_REL, ref=self.DR_BASE)
-        print('hh')
+        print('mu')
         self.movel(pos=self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
         self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('stirpos')
         self.down_stir_up()
         self.movel(self.stir_pose["stir"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('stirpos after stir')
         self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('m0')
         # self.movel(self.stir_pose["spoon_grasp_0"]["task"], vel=VELOCITY, acc = ACCURACY)
-        print('hh')
+        print('done')
 
     def down_stir_up(self, target_pos=336.4, turning_radius=10, stir_repeat=10, return_posx=100, force_desired=20):
         k_d = [3000.0, 3000.0, 3000.0, 200.0, 200.0, 200.0] ## need to check
@@ -94,7 +94,7 @@ class StirAction(BaseAction):
             ref=self.DR_BASE
             )
         
-        self.movej(pos=[0,0,100,0,0,0], vel=VELOCITY, acc=ACCURACY, mod=self.DR_MV_MOD_REL)
+        # self.movej(pos=[0,0,100,0,0,0], vel=VELOCITY, acc=ACCURACY, mod=self.DR_MV_MOD_REL)
 
     def grasp(self, x):
         self._set_custom_grasp(x)
