@@ -4,6 +4,7 @@ import DR_init
 import os, yaml
 # from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
+from .stir_and_garnish.garnish import GarnishAction
 
 from DR_common2 import posx, posj
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
@@ -38,7 +39,8 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir'])
+            StirAction(node, poses['stir']),
+            GarnishAction(node, poses['garnish'], "lime")
         ]
     }
 
@@ -47,6 +49,22 @@ def main():
     rclpy.init()
     node = rclpy.create_node("main", namespace=ROBOT_ID)
     DR_init.__dsr__node = node
+
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+    
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
 
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)
