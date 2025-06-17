@@ -11,7 +11,8 @@ from DR_common2 import posx, posj
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
 
-ROBOT_ID = ''#"dsr01"
+ROBOT_ID = "dsr01" # for rviz
+# ROBOT_ID = "" # for moveit
 ROBOT_MODEL = "m0609"
 VELOCITY, ACC = 60, 60
 
