@@ -45,7 +45,7 @@ def get_recipes(node, poses):
         ],
         'test': [
             StirAction(node, poses['stir']),
-            # GarnishAction(node, poses['garnish'], "lime")
+            GarnishAction(node, poses['garnish'], "lime")
         ]
     }
 
