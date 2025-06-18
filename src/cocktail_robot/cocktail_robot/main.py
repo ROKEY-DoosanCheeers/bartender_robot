@@ -75,7 +75,7 @@ def main():
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
 
-    cocktail = 'Margarita'
+    cocktail = input("만들 칵테일을 입력하세요: ")
     if cocktail not in recipes:
         print("해당 레시피가 없습니다.")
         return
