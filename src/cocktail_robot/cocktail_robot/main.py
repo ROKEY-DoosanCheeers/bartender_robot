@@ -10,8 +10,6 @@ from .stir_and_garnish.garnish import GarnishAction
 from ament_index_python.packages import get_package_share_directory
 from .pour.pour import PourAction
 
-
-
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
     "pose.yaml"
@@ -44,8 +42,7 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir']),
-            GarnishAction(node, poses['garnish'], "lime")
+            TumblerAction(node, poses['tumbler'],'open'),
         ]
     }
 
