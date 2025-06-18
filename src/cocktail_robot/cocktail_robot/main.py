@@ -4,12 +4,14 @@ import DR_init
 import os, yaml
 # from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
+from .pour.pour import PourAction
+from ament_index_python.packages import get_package_share_directory
 
-from DR_common2 import posx, posj
-# 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
+POSE_PATH = os.path.join(
+    get_package_share_directory("cocktail_robot"),
+    "pose.yaml"
+)
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
 
 ROBOT_ID = "dsr01" # for rviz
 # ROBOT_ID = "" # for moveit
@@ -24,21 +26,20 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            # PourAction(arm, "tequila", 50, poses["pour_tequila"]),
-            # PourAction(arm, "blue_juice", 20, poses["pour_tequila"]),
+            # PourAction("tequila", 50, "shaker", poses["pour"]),
+            # PourAction("blue_juice", 20, "shaker", poses["pour"]),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
         ],
         'China Red': [
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-            # PourAction(arm, "red_juice", 30, pose="pour_red"),
-            # ShakeAction(arm, pose="shake_zone", cycles=5),
+            # PourAction("tequila", 50, "glass", pose=["pour"]),
+            # PourAction("red_juice", 30, "glass", pose=["pour"]),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir'])
+            PourAction(node, ingredient="tequila", amount=50, target="glass", pour_pose=poses["pour"])
         ]
     }
 
@@ -48,9 +49,26 @@ def main():
     node = rclpy.create_node("main", namespace=ROBOT_ID)
     DR_init.__dsr__node = node
 
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
+
 
     cocktail = input("만들 칵테일을 입력하세요: ")
     if cocktail not in recipes:
