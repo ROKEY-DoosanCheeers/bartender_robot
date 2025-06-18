@@ -8,6 +8,8 @@ from .shaker.shaker_pour import PourAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
 from ament_index_python.packages import get_package_share_directory
+from .pour.pour import PourAction
+
 
 
 POSE_PATH = os.path.join(
@@ -28,18 +30,16 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            ShakerAction(node,poses["shake"])
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-            # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
+            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="blue_juice", amount=20, target="shaker", pour_pose=poses["pour"]),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
+            PourAction(node, ingredient="shaker_", amount=80, target="glass", pour_pose=poses["pour"])
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
         ],
         'China Red': [
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-
-            # PourAction(arm, "red_juice", 30, pose="pour_red"),
-            # ShakeAction(arm, pose="shake_zone", cycles=5),
+            PourAction(node, ingredient="tequila", amount=50, target="glass", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="red_juice", amount=30, target="glass", pour_pose=poses["pour"]),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
         ],
@@ -71,11 +71,27 @@ def main():
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
 
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
 
-    cocktail = 'Margarita'
+    cocktail = input("만들 칵테일을 입력하세요: ")
     if cocktail not in recipes:
         print("해당 레시피가 없습니다.")
         return
