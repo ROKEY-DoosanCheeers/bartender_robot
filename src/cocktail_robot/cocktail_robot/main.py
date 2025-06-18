@@ -3,10 +3,10 @@ from rclpy.node import Node
 import DR_init
 import os, yaml
 # from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
-from .stir_and_garnish.stir import StirAction
-from .stir_and_garnish.garnish import GarnishAction
-
-from DR_common2 import posx, posj
+# from .stir_and_garnish.stir import StirAction
+# from .stir_and_garnish.garnish import GarnishAction
+from .tumbler.tumbler_close import TumblerAction
+# from DR_common2 import posx, posj
 # 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,8 +39,7 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir']),
-            GarnishAction(node, poses['garnish'], "lime")
+            TumblerAction(node, poses['tumbler']),
         ]
     }
 
