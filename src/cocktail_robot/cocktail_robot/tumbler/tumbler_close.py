@@ -36,10 +36,11 @@ class TumblerAction(BaseAction):
         time.sleep(0.5)
 
     def spin(self,force = 5, angle =270, period = 2.0, atime =1.0, force_check = 10):
-        center = DR.get_current_pose()
+        # center = DR.get_current_pose()
         fd = [0,0,force,0,0,0]
         fdir = [0,0,1,0,0,0]
-        DR.set_desired_force(fd,dir =fdir, mod='REL')
+        DR.task_compliance_ctrl([5,5,3000,200,200,200])
+        DR.set_desired_force(fd,dir =fdir, mod=DR.DR_FC_MOD_REL)
         amp = [0.0, 0.0, 0.0, 0.0, 0.0, angle]  # Z회전r
         period_vals = [0.0, 0.0, 0.0, 0.0, 0.0, period]
         repeat = 1
@@ -47,9 +48,9 @@ class TumblerAction(BaseAction):
         DR.amove_periodic(amp, period_vals, atime, repeat, ref=reference)
         try:
             while True:
-                current_force = DR.check_force_condition()
-                z_force = current_force[5]
-                if DR.check_forec_condition(DR.DR_AXIS_Z,max = force_check):
+                # current_force = DR.check_force_condition()
+                # z_force = current_force[5]
+                if DR.check_force_condition(DR.DR_AXIS_Z,max = force_check):
                     print(f"force ")
                     break
                 time.sleep(0.5)
@@ -58,6 +59,10 @@ class TumblerAction(BaseAction):
             DR.release_force
             DR.release_compliance_ctrl()
             DR.release()
+        # DR.set_desired_force([0,0,-10,0,0,10],[0,0,1,0,0,1],time=0.5,mod=DR.DR_FC_MOD_REL)
+        # while not DR.check_force_condition(DR.DR_AXIS_Z,max=force_check):
+        #     # DR.amovel(pos=[0,0,0,0,0,10],vel=VELOCITY,acc=ACCURACY,ref=DR.DR_MV_MOD_REL)
+        #     DR.wait(0.5)
 
     def release(self, x):
         self._set_custom_grasp(x)
