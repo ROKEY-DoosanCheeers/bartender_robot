@@ -4,7 +4,7 @@ import DR_init
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 30, 30
+VELOCITY, ACCURACY = 60, 60
 ON, OFF = 1, 0
 DR = None
 
@@ -31,43 +31,68 @@ class PourAction:
 
 
     def execute(self):
-        # set position
-        DR.movej([0,0,90,0,90,0], vel=VELOCITY, acc = ACCURACY)
-        #DR.movej(self.pour_pose["pour_ready"]["joint"], vel=VELOCITY, acc = ACCURACY) #시작점
-        self.release(self.grasp_option)
-
-        # pick
-        DR.movejx(self.pour_pose["pick_before"]["task"], vel=VELOCITY, acc = ACCURACY,sol=7)
         pick_before = self.pour_pose[self.ingredient]["task"].copy()
         pick_after = self.pour_pose[self.ingredient]["task"].copy()
         pick_before[1] = self.pour_pose[self.ingredient]["task"][1] - 30
         pick_after[2] = self.pour_pose[self.ingredient]["task"][2] + 100
+
+
+        # set position
+        DR.movej([0,0,90,0,90,0], vel=VELOCITY*0.3, acc = ACCURACY)
+        # DR.movej(self.pour_pose["pour_ready"]["joint"], vel=VELOCITY, acc = ACCURACY) #시작점
+        self.release(self.grasp_option)
+
+        # pick
+        if self.ingredient == "shaker_":
+            DR.movel(self.pour_pose['shaker_pick_before']['task'],vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose['shaker_pick']['task'],vel=VELOCITY,acc=ACCURACY)
+
+            DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
+            self.grasp(self.grasp_option)
+            DR.movel(self.pour_pose['shaker_pick_before']['task'],vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
+
+            # pour
+            DR.movel(self.pour_pose["shaker_glass"]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+            DR.movel(self.pour_pose["shaker_glass"]["start"]["task"], vel=VELOCITY*0.3, acc = ACCURACY)
+            time.sleep(0.5)
+            DR.movel(self.pour_pose["shaker_glass"]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+
+            # go to place
+            DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
+            DR.movel(self.pour_pose['shaker_pick_before']['task'],vel=VELOCITY,acc=ACCURACY)
+            DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
+            self.release(self.grasp_option)
+
+        else:
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY, acc = ACCURACY,sol=7)
+
+            DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
+            self.grasp(self.grasp_option)
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY, acc = ACCURACY,sol=7)
+            DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
+
+            # pour
+            DR.movel(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+            DR.movel(self.pour_pose[self.target]["start"]["task"], vel=VELOCITY*0.3, acc = ACCURACY)
+            time.sleep(0.5)
+            DR.movel(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+
+            # go to place
+            DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY, acc = ACCURACY,sol=7)
+            DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
+            DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
+            self.release(self.grasp_option)
+
+
+        # end
         DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
-        DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
-        self.grasp(self.grasp_option)
-        DR.movel(pick_after, vel=VELOCITY, acc = ACCURACY)
+        DR.movej([0,0,90,0,90,0], vel=VELOCITY*0.3, acc = ACCURACY)
 
-        # # pour
-        DR.movejx(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY,sol=2)
-        
-        DR.movejx(self.pour_pose[self.target]["start"]["task"], vel=VELOCITY, acc = ACCURACY,sol=2)
-        time.sleep(1)
-        DR.movejx(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY,sol=2)
-
-        # # go to place
-        # DR.movel(self.pour_pose["pick_up"]["task"], vel=VELOCITY, acc = ACCURACY)
-        # DR.movel(self.pour_pose["pick_before"]["task"], vel=VELOCITY, acc = ACCURACY)
-        # DR.movej(self.pour_pose["pick_before"]["joint"], vel=VELOCITY, acc = ACCURACY)
-        # DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
-        # self.release(self.grasp_option)
-
-        # # end
-        # DR.movel(self.pour_pose["pick_before"]["task"], vel=VELOCITY, acc = ACCURACY)
-        # DR.movej(self.pour_pose["pour_ready"]["joint"], vel=VELOCITY, acc = ACCURACY)
-
-
-        # self.grasp(self.grasp_option)
-        # self.release(self.grasp_option)
 
 
     def grasp(self, x):
