@@ -2,15 +2,18 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
-# from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
-# from .stir_and_garnish.stir import StirAction
-# from .stir_and_garnish.garnish import GarnishAction
-from .tumbler.tumbler_close import TumblerAction
-# from DR_common2 import posx, posj
-# 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
+from .shaker.shaker_action import ShakerAction
+from .shaker.shaker_pour import PourAction    
+from .stir_and_garnish.stir import StirAction
+from .stir_and_garnish.garnish import GarnishAction
+from ament_index_python.packages import get_package_share_directory
+from .pour.pour import PourAction
+
+POSE_PATH = os.path.join(
+    get_package_share_directory("cocktail_robot"),
+    "pose.yaml"
+)
 
 ROBOT_ID = "dsr01" # for rviz
 # ROBOT_ID = "" # for moveit
@@ -25,16 +28,16 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            # PourAction(arm, "tequila", 50, poses["pour_tequila"]),
-            # PourAction(arm, "blue_juice", 20, poses["pour_tequila"]),
+            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="blue_juice", amount=20, target="shaker", pour_pose=poses["pour"]),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
+            PourAction(node, ingredient="shaker_", amount=80, target="glass", pour_pose=poses["pour"])
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
         ],
         'China Red': [
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-            # PourAction(arm, "red_juice", 30, pose="pour_red"),
-            # ShakeAction(arm, pose="shake_zone", cycles=5),
+            PourAction(node, ingredient="tequila", amount=50, target="glass", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="red_juice", amount=30, target="glass", pour_pose=poses["pour"]),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
         ],
@@ -61,6 +64,22 @@ def main():
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
     
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)

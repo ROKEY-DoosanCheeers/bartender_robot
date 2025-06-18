@@ -3,7 +3,7 @@
 from .base_action import BaseAction
 from DR_common2 import posx
 
-class PourAction(BaseAction):
+class PourreadyAction(BaseAction):
     def __init__(self, arm, ingredient, amount, pose_dict):     # pose_dict로 location.yaml 파일을 불러옴
         self.arm = arm
         self.ingredient = ingredient
