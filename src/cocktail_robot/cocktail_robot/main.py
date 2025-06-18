@@ -2,23 +2,18 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
-from .utils.garnish import GarnishAction
+
 from .shaker.shaker_action import ShakerAction
 from .shaker.shaker_pour import PourAction    
-# from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
 from .stir_and_garnish.stir import StirAction
+from .stir_and_garnish.garnish import GarnishAction
+from ament_index_python.packages import get_package_share_directory
 
-ROBOT_ID = "dsr01"
-ROBOT_MODEL = "m0609"
-VELOCITY, ACC = 30, 30
 
-# DR_init.__dsr__id = ROBOT_ID
-DR_init.__dsr__model = ROBOT_MODEL
-ON, OFF = 1, 0
-# 여기에 import할 각 모듈 파일과 클래스명 추가. 동작별 import
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-POSE_PATH = os.path.join(BASE_DIR, "locations/pose.yaml")
+POSE_PATH = os.path.join(
+    get_package_share_directory("cocktail_robot"),
+    "pose.yaml"
+)
 
 ROBOT_ID = "dsr01" # for rviz
 # ROBOT_ID = "" # for moveit
@@ -42,13 +37,15 @@ def get_recipes(node, poses):
         ],
         'China Red': [
             # PourAction(arm, "tequila", 50, pose="pour_tequila"),
+
             # PourAction(arm, "red_juice", 30, pose="pour_red"),
             # ShakeAction(arm, pose="shake_zone", cycles=5),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
         ],
         'test': [
-            StirAction(node, poses['stir'])
+            StirAction(node, poses['stir']),
+            # GarnishAction(node, poses['garnish'], "lime")
         ]
     }
 
@@ -57,6 +54,22 @@ def main():
     rclpy.init()
     node = rclpy.create_node("main", namespace=ROBOT_ID)
     DR_init.__dsr__node = node
+
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+    
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
 
     poses = load_yaml(POSE_PATH)
     recipes = get_recipes(node, poses)

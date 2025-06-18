@@ -1,24 +1,57 @@
 # pick and place in 1 method. from pos1 to pos2 @20241104
 import time
 import rclpy
-from DSR_ROBOT2 import DR_MV_MOD_REL, DR_BASE, DR_AXIS_Z, DR_QSTOP, DR_TOOL
-from DR_common2 import posx, posj
+import DR_init
 from ..utils.base_action import BaseAction
 
 
-
+ON, OFF = 1, 0
+VELOCITY, ACCURACY = 60, 60
 ### 힘 제어 : BASE 좌표계 기준
 class GarnishAction(BaseAction):
-    def __init__(self, arm, garnish_pose, topping):
-        self.arm = arm
+    def __init__(self, node, garnish_pose, topping):
+        DR_init.__dsr__node = node
+
+        try:
+            import DSR_ROBOT2
+
+        except ImportError as e:
+            print(f"Error importing DSR_ROBOT2 : {e}")
+            return
+        
+        global DR
+        DR = DSR_ROBOT2
+
         self.garnish_pose = garnish_pose
+        self.grasp_option = 1
         self.topping = topping
 
     def execute(self):
-        self.arm.movej(self.garnish_pose[self.topping]["joint"]) #### pos before grasp
-        self.arm.movel(pos=[0,0,-40,0,0,0], mod=DR_MV_MOD_REL, ref=DR_BASE)
-        self.arm.grasp()
-        self.arm.movel(pos=[0,0,40,0,0,0], mod=DR_MV_MOD_REL, ref=DR_BASE)
-        self.arm.movej(self.garnish_pose["garnish_0"]["joint"])
-        self.arm.movej(self.garnish_pose["garnish_drop"]["joint"])
+        # uncomment if task ready position is needed
+        # self.movel(self.garnish_pose["garnish_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
 
+        DR.movel(self.garnish_pose[f"{self.topping}_0"]["task"], vel=VELOCITY, acc=ACCURACY)
+        DR.movel(self.garnish_pose[f"{self.topping}_1"]["task"], vel=VELOCITY, acc=ACCURACY)
+        self.grasp(self.grasp_option)
+        DR.movel(self.garnish_pose["garnish_drop_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
+        DR.movel(self.garnish_pose["garnish_drop"]["task"], vel=VELOCITY, acc=ACCURACY)
+        self.release(self.grasp_option)
+
+        # uncomment if task ready position is needed
+        # self.movel(self.garnish_pose["garnish_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
+
+    def grasp(self, x):
+        self._set_custom_grasp(x)
+        DR.set_digital_output(1, ON)
+        time.sleep(0.5)
+
+    def release(self, x):
+        self._set_custom_grasp(x)
+        DR.set_digital_output(1, OFF)
+        time.sleep(0.5)
+
+    def _set_custom_grasp(self, x):
+        if x == 0:
+            DR.set_digital_output(2, OFF)
+        elif x == 1:
+            DR.set_digital_output(2, ON)
