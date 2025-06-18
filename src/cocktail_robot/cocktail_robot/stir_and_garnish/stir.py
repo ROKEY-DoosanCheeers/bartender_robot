@@ -77,7 +77,6 @@ class StirAction(BaseAction):
 
         while True:
             if not DR.check_position_condition(axis=DR.DR_AXIS_Z, max=target_pos, ref=DR.DR_BASE):
-                print('heyeyeye')
                 time.sleep(0.5)
                 break
 
@@ -86,7 +85,7 @@ class StirAction(BaseAction):
 
         DR.move_periodic(
             amp=[turning_radius, turning_radius, 0, 0, 0, 0],
-            period=[1.5, 1.5, 0, 0, 0, 0],
+            period=[2, 3, 0, 0, 0, 0],
             repeat=stir_repeat,
             ref=DR.DR_BASE
             )
