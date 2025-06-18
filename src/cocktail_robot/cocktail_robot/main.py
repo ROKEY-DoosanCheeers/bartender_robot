@@ -44,7 +44,8 @@ def get_recipes(node, poses):
             GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-            TumblerAction(node, poses['tumbler'],'open'),
+            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
         ]
     }
 
