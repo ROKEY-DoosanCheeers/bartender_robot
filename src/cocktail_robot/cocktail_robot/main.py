@@ -9,7 +9,7 @@ from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
 from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
-
+from .pour.pour import PourAction
 
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
@@ -44,8 +44,7 @@ def get_recipes(node, poses):
             GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-            StirAction(node, poses['stir']),
-            GarnishAction(node, poses['garnish'], "lime")
+            TumblerAction(node, poses['tumbler'],'open'),
         ]
     }
 
@@ -67,6 +66,22 @@ def main():
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
     
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
