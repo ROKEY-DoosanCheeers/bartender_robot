@@ -8,7 +8,7 @@ VELOCITY, ACCURACY = 100, 60
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
-    def __init__(self, node, stir_pose):
+    def __init__(self, node, poses):
         DR_init.__dsr__node = node
 
         try:
@@ -21,7 +21,7 @@ class StirAction(BaseAction):
         global DR
         DR = DSR_ROBOT2
 
-        self.stir_pose = stir_pose
+        self.stir_pose = poses
         self.grasp_option = 1
 
         
