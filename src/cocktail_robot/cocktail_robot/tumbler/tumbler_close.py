@@ -23,9 +23,16 @@ class TumblerAction(BaseAction):
     def execute(self):
         DR.movej(pos=self.tumbler_pose["origin"]["joint"],vel = VELOCITY, acc = ACCURACY)
         self.release(self.grasp_option)
-        DR.movej(pos=self.tumbler_pose["cover_top"]["joint"],vel=VELOCITY, acc = ACCURACY)
+        tumbler_cover_up = self.tumbler_pose["cover_top"]["task"].copy()
+        tumbler_mouth_up = self.tumbler_pose["mouth_top"]["task"].copy()
+        tumbler_cover_up[2] = 250
+        tumbler_mouth_up[2] = 250
+        DR.movel(pos=tumbler_cover_up,vel=VELOCITY, acc = ACCURACY) #pos
+        DR.movel(pos=self.tumbler_pose["cover_top"]["task"],vel=VELOCITY, acc = ACCURACY) #pos
         self.grasp(self.grasp_option)
-        DR.movej(pos=self.tumbler_pose["mouth_top"]["joint"],vel = VELOCITY,acc = ACCURACY)
+        DR.movel(pos=tumbler_cover_up,vel=VELOCITY, acc = ACCURACY) #pos
+        DR.movel(pos=tumbler_mouth_up,vel=VELOCITY,acc=ACCURACY)
+        DR.movel(pos=self.tumbler_pose["mouth_top"]["task"],vel = VELOCITY,acc = ACCURACY) #pos
         self.spin()
         DR.movej(pos=self.tumbler_pose["origin"]["joint"],vel = VELOCITY, acc = ACCURACY)
         
@@ -45,32 +52,36 @@ class TumblerAction(BaseAction):
         period_vals = [0.0, 0.0, 0.0, 0.0, 0.0, period]
         repeat = 1
         reference = self.DR_BASE
-        DR.amove_periodic(amp, period_vals, atime, repeat, ref=reference)
-        try:
-            while True:
-                # current_force = DR.check_force_condition()
-                # z_force = current_force[5]
-                if DR.check_force_condition(DR.DR_AXIS_Z,max = force_check):
-                    print(f"force ")
-                    break
-                time.sleep(0.5)
-        finally:
-            DR.amove_periodic_stop()
-            DR.release_force
-            DR.release_compliance_ctrl()
-            DR.release()
-        # DR.set_desired_force([0,0,-10,0,0,10],[0,0,1,0,0,1],time=0.5,mod=DR.DR_FC_MOD_REL)
-        # while not DR.check_force_condition(DR.DR_AXIS_Z,max=force_check):
-        #     # DR.amovel(pos=[0,0,0,0,0,10],vel=VELOCITY,acc=ACCURACY,ref=DR.DR_MV_MOD_REL)
-        #     DR.wait(0.5)
+        # DR.amove_periodic(amp, period_vals, atime, repeat, ref=reference)
+        # try:
+        #     while True:
+        #         # current_force = DR.check_force_condition()
+        #         # z_force = current_force[5]
+        #         if DR.check_force_condition(DR.DR_AXIS_Z,max = force_check):
+        #             print(f"force ")
+        #             break
+        #         time.sleep(0.5)
+        # finally:
+        #     DR.amove_periodic_stop()
+        #     DR.release_force
+        #     DR.release_compliance_ctrl()
+        #     DR.release()
+        DR.set_desired_force([0,0,-10,0,0,10],[0,0,1,0,0,1],time=0.5,mod=DR.DR_FC_MOD_REL)
+        while not DR.check_force_condition(DR.DR_AXIS_Z,max=force_check):
+            # DR.amovel(pos=[0,0,0,0,0,10],vel=VELOCITY,acc=ACCURACY,ref=DR.DR_MV_MOD_REL)
+            DR.wait(0.5)
+
+        DR.release_force
+        DR.release_compliance_ctrl()
+        self.release(0)
 
     def release(self, x):
         self._set_custom_grasp(x)
-        self.set_digital_output(1, OFF)
+        DR.set_digital_output(1, OFF)
         time.sleep(0.5)
 
     def _set_custom_grasp(self, x):
         if x == 0:
-            self.set_digital_output(2, OFF)
+            DR.set_digital_output(2, OFF)
         elif x == 1:
-            self.set_digital_output(2, ON)
+            DR.set_digital_output(2, ON)
