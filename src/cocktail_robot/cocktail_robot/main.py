@@ -3,12 +3,13 @@ from rclpy.node import Node
 import DR_init
 import os, yaml
 
-from .shaker.shaker_action import ShakerAction
-from .shaker.shaker_pour import PourAction    
+from .pour.pour import PourAction
+from .shaker.shaker import ShakerAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
+from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
-
+from .pour.pour import PourAction
 
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
@@ -28,24 +29,22 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            ShakerAction(node,poses["shake"])
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-            # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
-            # ShakeAction(arm, pose="shake_zone", cycles=7),
-            # GarnishAction(arm, poses["garnish"]),
-            # PlateAction(arm),
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="shaker"), # tequila -> shaker
+            PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=20, target="shaker"), # blue_juice -> shaker
+            TumblerAction(node, poses=poses["tumbler"], move="open"), # close
+            ShakerAction(node, poses=poses["shake"]), # shake
+            TumblerAction(node, poses=poses["tumbler"], move="close"), # open
+            PourAction(node, poses=poses["pour"], ingredient="shaker_", amount=80, target="glass"), # shaker -> glass
+            GarnishAction(node, poses=poses["garnish"], topping="lime")
         ],
         'China Red': [
-            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
-
-            # PourAction(arm, "red_juice", 30, pose="pour_red"),
-            # ShakeAction(arm, pose="shake_zone", cycles=5),
-            # GarnishAction(arm, poses["garnish"]),
-            # PlateAction(arm)
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="glass"),
+            PourAction(node, poses=poses["pour"], ingredient="red_juice", amount=30, target="glass"),
+            StirAction(node, poses['stir']), # stir
+            GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-            StirAction(node, poses['stir']),
-            GarnishAction(node, poses['garnish'], "lime")
+            TumblerAction(node, poses['tumbler'],'open'),
         ]
     }
 
@@ -67,6 +66,22 @@ def main():
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
     
+    set_tool("GripperDA_v2")
+    set_tcp("Tool Weighttest")
+    set_ref_coord(DR_BASE)
+
+    try:
+        from DSR_ROBOT2 import (
+            set_tool,
+            set_tcp,
+            set_ref_coord,
+            DR_BASE
+        )
+
+    except ImportError as e:
+        print(f"Error importing DSR_ROBOT2 : {e}")
+        return
+
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
