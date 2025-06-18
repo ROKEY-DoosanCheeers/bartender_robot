@@ -44,7 +44,7 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
-            # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
             PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
         ]
     }
