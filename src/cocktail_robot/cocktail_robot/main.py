@@ -2,16 +2,18 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
-# from src.cocktail_robot.cocktail_robot.utils.robot_arm import RobotArm
+
+from .shaker.shaker_action import ShakerAction
+from .shaker.shaker_pour import PourAction    
 from .stir_and_garnish.stir import StirAction
-from .pour.pour import PourAction
+from .stir_and_garnish.garnish import GarnishAction
 from ament_index_python.packages import get_package_share_directory
+
 
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
     "pose.yaml"
 )
-
 
 ROBOT_ID = "dsr01" # for rviz
 # ROBOT_ID = "" # for moveit
@@ -26,15 +28,16 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            # PourAction("tequila", 50, "shaker", poses["pour"]),
-            # PourAction("blue_juice", 20, "shaker", poses["pour"]),
+            # PourAction(arm, "tequila", 50, poses["pour_tequila"]),
+            # PourAction(arm, "blue_juice", 20, poses["pour_tequila"]),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
         ],
         'China Red': [
-            # PourAction("tequila", 50, "glass", pose=["pour"]),
-            # PourAction("red_juice", 30, "glass", pose=["pour"]),
+            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
+            # PourAction(arm, "red_juice", 30, pose="pour_red"),
+            # ShakeAction(arm, pose="shake_zone", cycles=5),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm)
         ],
@@ -60,7 +63,7 @@ def main():
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
-
+    
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
@@ -70,7 +73,8 @@ def main():
     print("가능한 칵테일:", list(recipes.keys()))
 
 
-    cocktail = input("만들 칵테일을 입력하세요: ")
+
+    cocktail = 'Margarita'
     if cocktail not in recipes:
         print("해당 레시피가 없습니다.")
         return
