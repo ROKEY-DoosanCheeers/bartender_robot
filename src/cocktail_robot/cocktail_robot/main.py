@@ -2,9 +2,13 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
+
+from .shaker.shaker_action import ShakerAction
+from .shaker.shaker_pour import PourAction    
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
 from ament_index_python.packages import get_package_share_directory
+
 
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
@@ -24,8 +28,9 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            # PourAction(arm, "tequila", 50, poses["pour_tequila"]),
-            # PourAction(arm, "blue_juice", 20, poses["pour_tequila"]),
+            ShakerAction(node,poses["shake"])
+            # PourAction(arm, "tequila", 50, pose="pour_tequila"),
+            # PourAction(arm, "blue_juice", 20, pose="pour_blue"),
             # ShakeAction(arm, pose="shake_zone", cycles=7),
             # GarnishAction(arm, poses["garnish"]),
             # PlateAction(arm),
@@ -70,7 +75,7 @@ def main():
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
 
-    cocktail = input("만들 칵테일을 입력하세요: ")
+    cocktail = 'Margarita'
     if cocktail not in recipes:
         print("해당 레시피가 없습니다.")
         return
