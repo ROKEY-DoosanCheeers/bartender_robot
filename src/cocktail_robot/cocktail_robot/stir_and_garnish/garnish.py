@@ -9,7 +9,7 @@ ON, OFF = 1, 0
 VELOCITY, ACCURACY = 60, 60
 ### 힘 제어 : BASE 좌표계 기준
 class GarnishAction(BaseAction):
-    def __init__(self, node, garnish_pose, topping):
+    def __init__(self, node, poses, topping):
         DR_init.__dsr__node = node
 
         try:
@@ -22,7 +22,7 @@ class GarnishAction(BaseAction):
         global DR
         DR = DSR_ROBOT2
 
-        self.garnish_pose = garnish_pose
+        self.garnish_pose = poses
         self.grasp_option = 1
         self.topping = topping
 
