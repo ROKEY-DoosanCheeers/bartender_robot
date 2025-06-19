@@ -4,7 +4,7 @@ import time
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 100, 60
+VELOCITY, ACCURACY = 80, 60
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
@@ -52,10 +52,10 @@ class StirAction(BaseAction):
         self.down_stir(target_pos=_stir_target_pose)
         
         # print('stir up')
-        DR.movej(self.stir_pose["stir"]["joint"], vel=VELOCITY*0.5, acc = ACCURACY)
+        DR.movel(self.stir_pose["stir"]["task"], vel=VELOCITY*0.5, acc = ACCURACY)
         
         # print('go back and release')
-        DR.movel(self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        DR.movej(self.stir_pose["task_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
         DR.movej(self.stir_pose["spoon_grasp_up"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
         DR.movel(pos=[0,0,-330,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=DR.DR_MV_MOD_REL, ref=DR.DR_BASE)
         self.release(self.grasp_option)
@@ -65,24 +65,24 @@ class StirAction(BaseAction):
 
 
     def down_stir(self, target_pos=336.4, turning_radius=10, stir_repeat=4, force_desired=30):
-        DR.set_ref_coord(DR.DR_BASE)
-        k_d = [5, 5, 10, 200, 200, 200] ## need to check
+        # DR.set_ref_coord(DR.DR_BASE)
+        # k_d = [5, 5, 10, 200, 200, 200] ## need to check
 
-        f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
-        f_dir = [0, 0, 1, 0, 0, 0]
+        # f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
+        # f_dir = [0, 0, 1, 0, 0, 0]
         
-        DR.task_compliance_ctrl(k_d)
-        time.sleep(0.1)
-        DR.set_desired_force(fd=f_d, dir=f_dir, mod=DR.DR_FC_MOD_ABS)
+        # DR.task_compliance_ctrl(k_d)
+        # time.sleep(0.1)
+        # DR.set_desired_force(fd=f_d, dir=f_dir, mod=DR.DR_FC_MOD_ABS)
 
-        while True:
-            if not DR.check_position_condition(axis=DR.DR_AXIS_Z, max=target_pos, ref=DR.DR_BASE):
-                time.sleep(0.5)
-                break
+        # while True:
+        #     if not DR.check_position_condition(axis=DR.DR_AXIS_Z, max=target_pos, ref=DR.DR_BASE):
+        #         time.sleep(0.5)
+        #         break
 
-        DR.release_force(time=0.5)
-        DR.release_compliance_ctrl()
-
+        # DR.release_force(time=0.5)
+        # DR.release_compliance_ctrl()
+        DR.movel(self.stir_pose["stir_down"]["task"], vel=VELOCITY, acc = ACCURACY)
         DR.move_periodic(
             amp=[turning_radius, turning_radius, 0, 0, 0, 0],
             period=[2, 3, 0, 0, 0, 0],
