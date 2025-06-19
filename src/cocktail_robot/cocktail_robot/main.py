@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
+import numpy as np
 
 from .pour.pour import PourAction
 from .shaker.shaker import ShakerAction
@@ -90,6 +91,7 @@ def main():
     set_ref_coord(DR_BASE)
 
     poses = load_yaml(POSE_PATH)
+    recursive_check(poses)
     recipes = get_recipes(node, poses)
     print("가능한 칵테일:", list(recipes.keys()))
 
@@ -107,6 +109,22 @@ def main():
     movej(pos=[0,0,90,0,90,0], vel=VELOCITY*0.3, acc=ACC)
     rclpy.shutdown()
 
+
+def recursive_check(data_dict):
+    if isinstance(data_dict, dict):
+        for key, value in data_dict.items():
+            recursive_check(value)
+    elif isinstance(data_dict, list):
+        if len(data_dict) == 6 and all(isinstance(v, (int, float)) for v in data_dict):
+            arr = np.array(data_dict, dtype=np.float64)
+            print(f"float64[6] OK: {arr}")
+        elif len(data_dict) == 6:
+            raise TypeError(f"6개인데 float/int 아님: {data_dict}")
+        elif all(isinstance(v, (int, float)) for v in data_dict):
+            raise IndexError(f"값 개수 오류 ({len(data_dict)}개): {data_dict}")
+        else:
+            raise TypeError(f"값 개수와 타입 모두 문제: {data_dict}")
+            
 
 if __name__ == "__main__":
     main()
