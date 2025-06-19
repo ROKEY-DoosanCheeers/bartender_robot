@@ -3,10 +3,11 @@ from rclpy.node import Node
 import DR_init
 import os, yaml
 
-from .shaker.shaker_action import ShakerAction
-from .shaker.shaker_pour import PourAction    
+from .pour.pour import PourAction
+from .shaker.shaker import ShakerAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
+from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
 from .pour.pour import PourAction
 
@@ -28,23 +29,23 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="blue_juice", amount=20, target="shaker", pour_pose=poses["pour"]),
-            # ShakeAction(arm, pose="shake_zone", cycles=7),
-            PourAction(node, ingredient="shaker_", amount=80, target="glass", pour_pose=poses["pour"])
-            # GarnishAction(arm, poses["garnish"]),
-            # PlateAction(arm),
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="shaker"), # tequila -> shaker
+            PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=20, target="shaker"), # blue_juice -> shaker
+            TumblerAction(node, poses=poses["tumbler"], move="open"), # close
+            ShakerAction(node, poses=poses["shake"]), # shake
+            TumblerAction(node, poses=poses["tumbler"], move="close"), # open
+            PourAction(node, poses=poses["pour"], ingredient="shaker_", amount=80, target="glass"), # shaker -> glass
+            GarnishAction(node, poses=poses["garnish"], topping="lime")
         ],
         'China Red': [
-            PourAction(node, ingredient="tequila", amount=50, target="glass", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="red_juice", amount=30, target="glass", pour_pose=poses["pour"]),
-            # GarnishAction(arm, poses["garnish"]),
-            # PlateAction(arm)
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="glass"),
+            PourAction(node, poses=poses["pour"], ingredient="red_juice", amount=30, target="glass"),
+            StirAction(node, poses['stir']), # stir
+            GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-
-            TumblerAction(node, poses['tumbler'],'close'),
-            TumblerAction(node, poses['tumbler'],'open'),
+            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
         ]
     }
 
