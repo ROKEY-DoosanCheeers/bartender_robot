@@ -4,11 +4,13 @@ import rclpy
 from rclpy.node import Node
 import DR_init
 import os, yaml
+import numpy as np
 
-from .shaker.shaker_action import ShakerAction
-from .shaker.shaker_pour import PourAction    
+from .pour.pour import PourAction
+from .shaker.shaker import ShakerAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
+from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
 from .pour.pour import PourAction
 from .bartender_gui import BartenderGUI
@@ -30,25 +32,42 @@ def load_yaml(POSE_PATH):
 def get_recipes(node, poses):
     return {
         'Margarita': [
-            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="blue_juice", amount=20, target="shaker", pour_pose=poses["pour"]),
-            # ShakeAction(arm, pose="shake_zone", cycles=7),
-            PourAction(node, ingredient="shaker_", amount=80, target="glass", pour_pose=poses["pour"]),
-            GarnishAction(node, poses=poses["garnish"], topping="lime"),
-            # PlateAction(arm),
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="shaker"), # tequila -> shaker
+            PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=20, target="shaker"), # blue_juice -> shaker
+            TumblerAction(node, poses=poses["tumbler"], move="close"), # close
+            ShakerAction(node, poses=poses["shake"]), # shake
+            TumblerAction(node, poses=poses["tumbler"], move="open"), # open
+            PourAction(node, poses=poses["pour"], ingredient="shaker_", amount=80, target="glass"), # shaker -> glass
+            GarnishAction(node, poses=poses["garnish"], topping="lime")
         ],
         'China Red': [
-            PourAction(node, ingredient="tequila", amount=50, target="glass", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="red_juice", amount=30, target="glass", pour_pose=poses["pour"]),
-            # GarnishAction(arm, poses["garnish"]),
-            # PlateAction(arm)
+            PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="glass"),
+            PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=30, target="glass"),
+            StirAction(node, poses['stir']), # stir
+            GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
+            # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            # PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
+            StirAction(node, poses['stir']), # stir
         ]
     }
 
+def recursive_check(data_dict):
+    if isinstance(data_dict, dict):
+        for key, value in data_dict.items():
+            recursive_check(value)
+    elif isinstance(data_dict, list):
+        if len(data_dict) == 6 and all(isinstance(v, (int, float)) for v in data_dict):
+            arr = np.array(data_dict, dtype=np.float64)
+            print(f"float64[6] OK: {arr}")
+        elif len(data_dict) == 6:
+            raise TypeError(f"6개인데 float/int 아님: {data_dict}")
+        elif all(isinstance(v, (int, float)) for v in data_dict):
+            raise IndexError(f"값 개수 오류 ({len(data_dict)}개): {data_dict}")
+        else:
+            raise TypeError(f"값 개수와 타입 모두 문제: {data_dict}")
+        
 def main():
     rclpy.init()
     node = rclpy.create_node("main", namespace=ROBOT_ID)
@@ -56,20 +75,23 @@ def main():
 
     try:
         from DSR_ROBOT2 import (
+            movej,
             set_tool,
             set_tcp,
             set_ref_coord,
             DR_BASE
         )
+
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
-
+    
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
 
     poses = load_yaml(POSE_PATH)
+    recursive_check(poses)
     recipes = get_recipes(node, poses)
     gui_recipes = ['표지'] + list(recipes.keys())
 
@@ -109,6 +131,7 @@ def main():
     app = BartenderGUI(gui_recipes, recipes, robot_action_callback=robot_action_callback)
     app.mainloop()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

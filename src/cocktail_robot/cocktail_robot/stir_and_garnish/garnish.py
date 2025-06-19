@@ -6,7 +6,7 @@ from ..utils.base_action import BaseAction
 
 
 ON, OFF = 1, 0
-VELOCITY, ACCURACY = 60, 60
+VELOCITY, ACCURACY = 70, 60
 ### 힘 제어 : BASE 좌표계 기준
 class GarnishAction(BaseAction):
     def __init__(self, node, poses, topping):
@@ -28,10 +28,14 @@ class GarnishAction(BaseAction):
 
     def execute(self):
         # uncomment if task ready position is needed
-        # self.movel(self.garnish_pose["garnish_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
+        DR.movej(self.garnish_pose["garnish_ready"]["joint"], vel=VELOCITY*0.3, acc=ACCURACY)
 
-        DR.movel(self.garnish_pose[f"{self.topping}_0"]["task"], vel=VELOCITY, acc=ACCURACY)
-        DR.movel(self.garnish_pose[f"{self.topping}_1"]["task"], vel=VELOCITY, acc=ACCURACY)
+        # DR.movel(self.garnish_pose[f"{self.topping}_0"]["task"], vel=VELOCITY, acc=ACCURACY)
+        topping_up = self.garnish_pose[f"{self.topping}"]["task"].copy()
+        topping_up[2] += 33
+        DR.movel(topping_up, vel=VELOCITY, acc=ACCURACY)
+        DR.movel(self.garnish_pose[f"{self.topping}"]["task"], vel=VELOCITY, acc=ACCURACY)
+
         self.grasp(self.grasp_option)
         DR.movel(self.garnish_pose["garnish_drop_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
         DR.movel(self.garnish_pose["garnish_drop"]["task"], vel=VELOCITY, acc=ACCURACY)
