@@ -11,7 +11,7 @@ DR = None
 # PourAction(arm, "tequila", 50, shaker, poses["pour_tequila"])
 
 class PourAction:
-    def __init__(self, node, ingredient, amount, pour_pose, target):
+    def __init__(self, node,  poses, ingredient, amount, target):
         DR_init.__dsr__node = node
 
         try:
@@ -27,7 +27,7 @@ class PourAction:
         self.grasp_option = 0
         self.ingredient = ingredient
         self.target = target
-        self.pour_pose = pour_pose
+        self.pour_pose = poses
 
 
     def execute(self):
