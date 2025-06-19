@@ -31,21 +31,22 @@ def get_recipes(node, poses):
         'Margarita': [
             PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="shaker"), # tequila -> shaker
             PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=20, target="shaker"), # blue_juice -> shaker
-            TumblerAction(node, poses=poses["tumbler"], move="open"), # close
+            TumblerAction(node, poses=poses["tumbler"], move="close"), # close
             ShakerAction(node, poses=poses["shake"]), # shake
-            TumblerAction(node, poses=poses["tumbler"], move="close"), # open
+            TumblerAction(node, poses=poses["tumbler"], move="open"), # open
             PourAction(node, poses=poses["pour"], ingredient="shaker_", amount=80, target="glass"), # shaker -> glass
             GarnishAction(node, poses=poses["garnish"], topping="lime")
         ],
         'China Red': [
             PourAction(node, poses=poses["pour"], ingredient="tequila", amount=50, target="glass"),
-            PourAction(node, poses=poses["pour"], ingredient="red_juice", amount=30, target="glass"),
+            PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=30, target="glass"),
             StirAction(node, poses['stir']), # stir
             GarnishAction(node, poses=poses["garnish"], topping="cherry")
         ],
         'test': [
-            PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
-            PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
+            # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
+            # PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
+            StirAction(node, poses['stir']), # stir
         ]
     }
 
@@ -73,6 +74,7 @@ def main():
 
     try:
         from DSR_ROBOT2 import (
+            movej,
             set_tool,
             set_tcp,
             set_ref_coord,
@@ -97,9 +99,12 @@ def main():
         return
 
     print(f"\n[{cocktail}] 제조 시작!")
+    
+    movej(pos=[0,0,90,0,90,0], vel=VELOCITY*0.3, acc=ACC)
     for idx, action in enumerate(recipes[cocktail], 1):
+        print(f'STEP {idx}. Started')
         action.execute()
-
+    movej(pos=[0,0,90,0,90,0], vel=VELOCITY*0.3, acc=ACC)
     rclpy.shutdown()
 
 
