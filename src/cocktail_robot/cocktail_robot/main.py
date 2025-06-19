@@ -1,3 +1,5 @@
+import threading
+import time
 import rclpy
 from rclpy.node import Node
 import DR_init
@@ -8,17 +10,17 @@ from .pour.pour import PourAction
 from .shaker.shaker import ShakerAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
-# from .tumbler.tumbler import TumblerAction
+from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
 from .pour.pour import PourAction
+from .bartender_gui import BartenderGUI
 
 POSE_PATH = os.path.join(
     get_package_share_directory("cocktail_robot"),
     "pose.yaml"
 )
 
-ROBOT_ID = "dsr01" # for rviz
-# ROBOT_ID = "" # for moveit
+ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
 VELOCITY, ACC = 60, 60
 
@@ -48,9 +50,24 @@ def get_recipes(node, poses):
             # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
             # PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
             StirAction(node, poses['stir']), # stir
+        ]
     }
 
-
+def recursive_check(data_dict):
+    if isinstance(data_dict, dict):
+        for key, value in data_dict.items():
+            recursive_check(value)
+    elif isinstance(data_dict, list):
+        if len(data_dict) == 6 and all(isinstance(v, (int, float)) for v in data_dict):
+            arr = np.array(data_dict, dtype=np.float64)
+            print(f"float64[6] OK: {arr}")
+        elif len(data_dict) == 6:
+            raise TypeError(f"6개인데 float/int 아님: {data_dict}")
+        elif all(isinstance(v, (int, float)) for v in data_dict):
+            raise IndexError(f"값 개수 오류 ({len(data_dict)}개): {data_dict}")
+        else:
+            raise TypeError(f"값 개수와 타입 모두 문제: {data_dict}")
+        
 def main():
     rclpy.init()
     node = rclpy.create_node("main", namespace=ROBOT_ID)
@@ -76,38 +93,45 @@ def main():
     poses = load_yaml(POSE_PATH)
     recursive_check(poses)
     recipes = get_recipes(node, poses)
-    print("가능한 칵테일:", list(recipes.keys()))
+    gui_recipes = ['표지'] + list(recipes.keys())
 
-    cocktail = input("만들 칵테일을 입력하세요: ")
-    if cocktail not in recipes:
-        print("해당 레시피가 없습니다.")
-        return
+    # ================== 동작 관리 ==================
+    stop_flag = threading.Event()
+    action_thread = None
 
-    print(f"\n[{cocktail}] 제조 시작!")
-    
-    movej(pos=[0,0,90,0,90,0], vel=VELOCITY*0.3, acc=ACC)
-    for idx, action in enumerate(recipes[cocktail], 1):
-        print(f'STEP {idx}. Started')
-        action.execute()
-    movej(pos=[0,0,90,0,90,0], vel=VELOCITY*0.3, acc=ACC)
+    def robot_action_callback(recipe_name):
+        nonlocal action_thread
+        if recipe_name == "STOP":
+            app.set_status_msg("중단 요청!")
+            stop_flag.set()
+            return
+
+        if action_thread and action_thread.is_alive():
+            app.set_status_msg("이미 동작중! 중단 후 재실행하세요.")
+            return
+
+        def run_actions():
+            app.set_status_msg(f"[{recipe_name}] 제조 시작!")
+            stop_flag.clear()
+            for idx, action in enumerate(recipes[recipe_name], 1):
+                if stop_flag.is_set():
+                    app.set_status_msg(f"[{recipe_name}] → 동작 중단됨!")
+                    
+                    break
+                ing = getattr(action, 'ingredient', '-')
+                stepname = action.__class__.__name__
+                app.set_status_msg(f" - Step {idx}: [{ing}] [{stepname}] 실행 중.")
+                action.execute()
+                time.sleep(0.2)
+            else:
+                app.set_status_msg(f"[{recipe_name}] 제조 완료!")
+        action_thread = threading.Thread(target=run_actions, daemon=True)
+        action_thread.start()
+
+    app = BartenderGUI(gui_recipes, recipes, robot_action_callback=robot_action_callback)
+    app.mainloop()
     rclpy.shutdown()
 
-
-def recursive_check(data_dict):
-    if isinstance(data_dict, dict):
-        for key, value in data_dict.items():
-            recursive_check(value)
-    elif isinstance(data_dict, list):
-        if len(data_dict) == 6 and all(isinstance(v, (int, float)) for v in data_dict):
-            arr = np.array(data_dict, dtype=np.float64)
-            print(f"float64[6] OK: {arr}")
-        elif len(data_dict) == 6:
-            raise TypeError(f"6개인데 float/int 아님: {data_dict}")
-        elif all(isinstance(v, (int, float)) for v in data_dict):
-            raise IndexError(f"값 개수 오류 ({len(data_dict)}개): {data_dict}")
-        else:
-            raise TypeError(f"값 개수와 타입 모두 문제: {data_dict}")
-            
 
 if __name__ == "__main__":
     main()

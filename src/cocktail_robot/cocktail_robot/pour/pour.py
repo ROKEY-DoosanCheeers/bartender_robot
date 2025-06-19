@@ -26,6 +26,7 @@ class PourAction:
         
         self.grasp_option = 0
         self.ingredient = ingredient
+        self.amount = amount
         self.target = target
         self.pour_pose = poses
 
