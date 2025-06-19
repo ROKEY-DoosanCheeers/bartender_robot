@@ -74,7 +74,7 @@ class TumblerAction(BaseAction):
     def spin(self):
         DR.task_compliance_ctrl([5,5,500,100,100,100])
         time.sleep(0.1)
-        DR.set_desired_force([0,0,15,0,0,0],dir=[0,0,1,0,0,0])
+        DR.set_desired_force([0,0,-15,0,0,0],dir=[0,0,1,0,0,0])
         while True: # first
             if DR.check_force_condition(DR.DR_AXIS_Z,max=10):
                 break
@@ -93,7 +93,7 @@ class TumblerAction(BaseAction):
     def respin(self):
         DR.task_compliance_ctrl([5,5,500,100,100,100])
         time.sleep(0.1)
-        DR.set_desired_force([0,0,-15,0,0,0],dir=[0,0,1,0,0,0])
+        DR.set_desired_force([0,0,15,0,0,0],dir=[0,0,1,0,0,0])
         current_joint = DR.get_current_posj()
         for i in range(11):
             current_joint[5] -= 30
