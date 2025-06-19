@@ -74,7 +74,7 @@ class TumblerAction(BaseAction):
     def spin(self):
         DR.task_compliance_ctrl([5,5,500,100,100,100])
         time.sleep(0.1)
-        DR.set_desired_force([0,0,-15,0,0,0],dir=[0,0,1,0,0,0])
+        DR.set_desired_force([0,0,-25,0,0,0],dir=[0,0,1,0,0,0])
         while True: # first
             if DR.check_force_condition(DR.DR_AXIS_Z,max=10):
                 break
@@ -87,7 +87,7 @@ class TumblerAction(BaseAction):
             print(i)
         self.release(self.grasp_option)
         time.sleep(2)
-        DR.movel([524.66,-0.45, 210.20, 77.20,-179.20,-93.21])
+        DR.movel([524.66,-0.45, 210.20, 77.20,-179.20,-93.21], vel = 30, acc =30)
         self.grasp(self.grasp_option)
         for i in range(5):
             current_joint[5] += 30
@@ -101,7 +101,7 @@ class TumblerAction(BaseAction):
     def respin(self):
         DR.task_compliance_ctrl([5,5,500,100,100,100])
         time.sleep(0.1)
-        DR.set_desired_force([0,0,15,0,0,0],dir=[0,0,1,0,0,0])
+        DR.set_desired_force([0,0,25,0,0,0],dir=[0,0,1,0,0,0])
         current_joint = DR.get_current_posj()
         for i in range(5):
             current_joint[5] -= 30
@@ -109,7 +109,7 @@ class TumblerAction(BaseAction):
             print(i)
         self.release(self.grasp_option)
         time.sleep(2)
-        DR.movel([524.66,-0.45, 202.20, 77.20,-179.20,95.21])
+        DR.movel([524.66,-0.45, 202.20, 77.20,-179.20,160.79], vel = 30, acc =30)
         self.grasp(self.grasp_option)
         for i in range(5):
             current_joint[5] -= 30
