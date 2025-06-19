@@ -4,7 +4,7 @@ import DR_init
 import time
 ON, OFF = 1, 0
 DR = None
-VEL, ACC = 100, 30
+VEL, ACC = 100, 100
 class ShakerAction(BaseAction):
     def __init__(self, node, poses):
         DR_init.__dsr__node = node
@@ -22,6 +22,7 @@ class ShakerAction(BaseAction):
         shaking_poses = self.poses['shaking']
         place_before_poses = self.poses["place_before"]
         # 1. 잡는 위치로 이동
+        self.release()
         DR.movej([0,0,90,0,90,0],vel=VEL,acc=ACC)
         DR.movel(pick_before_poses['task'],vel=VEL,acc=ACC)
         DR.movel(pick_poses['task'],vel=VEL,acc=ACC)
@@ -29,9 +30,25 @@ class ShakerAction(BaseAction):
 
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC,ref=DR.DR_BASE)
-
-        DR.move_periodic([50, 50, 0, 0, 0, 45], [1.25,0.75, 0, 0, 0, 2],repeat=10,atime=0.1,ref=DR.DR_TOOL)
+    
+        # DR.move_periodic([100, 100, 0, 0, 0, 45], [1,1.5, 0, 0, 0, 2],repeat=10,atime=0.1,ref=DR.DR_TOOL)
         # 2. 충돌 방지 경로
+        for _ in range(10):
+            moving_pose = [0,60,40,0,35,0]
+            moving_pose1 = [0,-60,-40,0,-35,0]
+            DR.amovej(moving_pose1,vel=250,acc=120,mod=DR.DR_MV_MOD_REL)
+            DR.wait(0.45)
+            DR.amovej(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
+            DR.wait(0.45)
+
+        # for _ in range(10):
+        #     moving_pose = [0,60,40,0,35,0]
+        #     moving_pose1 = [0,-60,-40,0,-35,0]
+        #     DR.amovesx(moving_pose1,vel=250,acc=120,mod=DR.DR_MV_MOD_REL)
+        #     DR.wait(0.45)
+        #     DR.amovesx(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
+        #     DR.wait(0.45)
+
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC)
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)
         # 3. 내려놓기
