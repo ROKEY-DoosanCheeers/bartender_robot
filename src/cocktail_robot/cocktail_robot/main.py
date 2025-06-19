@@ -39,6 +39,8 @@ def get_recipes(node, poses):
             # PlateAction(arm)
         ],
         'test': [
+
+            TumblerAction(node, poses['tumbler'],'close'),
             TumblerAction(node, poses['tumbler'],'open'),
         ]
     }
