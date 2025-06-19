@@ -146,7 +146,7 @@ class BartenderGUI(tk.Tk):
         state_frame.pack(pady=(20,0))
 
         self._ice_img = Image.open(os.path.join(self.BASE_DIR, "../image/icesprite_0.png")).resize((32,32))
-        self._aging_img = Image.open(os.path.join(self.BASE_DIR, "../image/agesprite_0.png")).resize((32,32))
+        self._aging_img = Image.open(os.path.join(self.BASE_DIR, "../image/agesprite_0.png")).resize((60,60))
         self._shaker_img = Image.open(os.path.join(self.BASE_DIR, "../image/shaker_spr_0.png")).resize((60,90))
         self.ice_label = tk.Label(state_frame, bg="#19153b")
         self.ice_label.pack(side=tk.LEFT, padx=8)
@@ -155,10 +155,14 @@ class BartenderGUI(tk.Tk):
         self.shaker_label = tk.Label(state_frame, bg="#19153b")
         self.shaker_label.pack(side=tk.LEFT, padx=8)
 
+        # btns = tk.Frame(right, bg="#19153b")
+        # btns.pack(pady=8)
+        # tk.Button(btns, text="중지", width=11, bg="#222", fg="#fff", command=self.reset_page).pack(side=tk.LEFT, padx=18)
+        # tk.Button(btns, text="섞기", width=11, bg="#e45", fg="#fff", command=self.mix_cocktail).pack(side=tk.LEFT, padx=18)
+
         btns = tk.Frame(right, bg="#19153b")
         btns.pack(pady=8)
-        tk.Button(btns, text="중지", width=11, bg="#222", fg="#fff", command=self.reset_page).pack(side=tk.LEFT, padx=18)
-        tk.Button(btns, text="섞기", width=11, bg="#e45", fg="#fff", command=self.mix_cocktail).pack(side=tk.LEFT, padx=18)
+        tk.Button(btns, text="섞기",width=25, height=1, bg="#e45", fg="#fff", command=self.mix_cocktail).pack(padx=18)
 
         bottom = tk.Frame(self, bg="#101020", height=40)
         bottom.pack(fill=tk.X, side=tk.BOTTOM)
