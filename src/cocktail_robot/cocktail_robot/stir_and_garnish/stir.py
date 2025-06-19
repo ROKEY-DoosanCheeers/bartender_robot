@@ -4,7 +4,7 @@ import time
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 60, 60
+VELOCITY, ACCURACY = 85, 60
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
@@ -32,9 +32,9 @@ class StirAction(BaseAction):
         DR.movel(pos=self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
 
         # print('grasp position')
-        DR.movej(self.stir_pose["spoon_grasp_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
-        DR.movej(self.stir_pose["spoon_grasp_ready_down"]["joint"], vel=VELOCITY*0.08, acc = ACCURACY)
-        DR.movej(self.stir_pose["spoon_grasp"]["joint"], vel=VELOCITY*0.08, acc = ACCURACY)
+        DR.movej(self.stir_pose["spoon_grasp_ready"]["joint"], vel=VELOCITY*0.4, acc = ACCURACY)
+        DR.movej(self.stir_pose["spoon_grasp_ready_down"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
+        DR.movej(self.stir_pose["spoon_grasp"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
         
         # print('grasp')
         self.grasp(self.grasp_option)
@@ -45,7 +45,6 @@ class StirAction(BaseAction):
         # print('stir position')
         DR.movej(pos=self.stir_pose["task_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)        
         
-        
         DR.movej(self.stir_pose["stir_ready"]["joint"], vel=VELOCITY*0.5, acc = ACCURACY)
         # print('stir')
         self.down_stir(target_pos=self.stir_pose["stir"]["task"])
@@ -54,18 +53,17 @@ class StirAction(BaseAction):
         DR.movel(self.stir_pose["stir_ready"]["task"], vel=VELOCITY*0.5, acc = ACCURACY)
         
         # print('go back and release')
-        DR.movel(self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        DR.movej(self.stir_pose["task_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
+        print('ready')
         # DR.movej(self.stir_pose["spoon_grasp_up"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
-        spoon_grasp_up_joint = self.stir_pose["spoon_grasp"]["joint"]
-        print(f"spoon_grasp_up_joint before:{spoon_grasp_up_joint}")
-        spoon_grasp_up_joint[2] += 330
-        print(f"spoon_grasp_up_joint after:{spoon_grasp_up_joint}")
-        DR.movej(spoon_grasp_up_joint, vel=VELOCITY*0.08, acc = ACCURACY)
+
+        DR.movej(self.stir_pose["spoon_put_up"]["joint"], vel=VELOCITY*0.4, acc = ACCURACY)
         DR.movel(pos=[0,0,-330,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=DR.DR_MV_MOD_REL, ref=DR.DR_BASE)
         self.release(self.grasp_option)
-        DR.movel(pos=[0,0, 330,0,0,0], vel=VELOCITY, acc = ACCURACY, mod=DR.DR_MV_MOD_REL, ref=DR.DR_BASE)
+        
+        DR.movej(self.stir_pose["spoon_grasp_ready_down"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
         DR.movej(self.stir_pose["spoon_grasp_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
-        DR.movel(self.stir_pose["task_ready"]["task"], vel=VELOCITY, acc = ACCURACY)
+        DR.movej(self.stir_pose["task_ready"]["joint"], vel=VELOCITY*0.3, acc = ACCURACY)
 
 
     def force_down_stir(self, target_pos, turning_radius=10, stir_repeat=4, force_desired=30):
