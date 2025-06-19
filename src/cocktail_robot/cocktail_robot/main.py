@@ -8,7 +8,7 @@ from .pour.pour import PourAction
 from .shaker.shaker import ShakerAction
 from .stir_and_garnish.stir import StirAction
 from .stir_and_garnish.garnish import GarnishAction
-from .tumbler.tumbler import TumblerAction
+# from .tumbler.tumbler import TumblerAction
 from ament_index_python.packages import get_package_share_directory
 from .pour.pour import PourAction
 
@@ -48,7 +48,6 @@ def get_recipes(node, poses):
             # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
             # PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
             StirAction(node, poses['stir']), # stir
-        ]
     }
 
 

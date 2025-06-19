@@ -4,7 +4,9 @@ import time
 from ..utils.base_action import BaseAction
 
 
+
 VELOCITY, ACCURACY = 85, 60
+
 ON, OFF = 1, 0
 ### 힘 제어 : BASE 좌표계 기준
 class StirAction(BaseAction):
@@ -70,8 +72,8 @@ class StirAction(BaseAction):
         DR.set_ref_coord(DR.DR_BASE)
         k_d = [5, 5, 10, 200, 200, 200] ## need to check
 
-        f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
-        f_dir = [0, 0, 1, 0, 0, 0]
+        # f_d = [0.0, 0.0, -force_desired, 0.0, 0.0, 0.0]
+        # f_dir = [0, 0, 1, 0, 0, 0]
         
         DR.task_compliance_ctrl(k_d)
         time.sleep(0.1)
