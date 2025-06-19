@@ -59,22 +59,6 @@ def main():
 
     try:
         from DSR_ROBOT2 import (
-            set_tool,
-            set_tcp,
-            set_ref_coord,
-            DR_BASE
-        )
-
-    except ImportError as e:
-        print(f"Error importing DSR_ROBOT2 : {e}")
-        return
-    
-    set_tool("GripperDA_v2")
-    set_tcp("Tool Weighttest")
-    set_ref_coord(DR_BASE)
-
-    try:
-        from DSR_ROBOT2 import (
             movej,
             set_tool,
             set_tcp,
@@ -85,7 +69,7 @@ def main():
     except ImportError as e:
         print(f"Error importing DSR_ROBOT2 : {e}")
         return
-
+    
     set_tool("GripperDA_v2")
     set_tcp("Tool Weighttest")
     set_ref_coord(DR_BASE)
