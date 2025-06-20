@@ -24,6 +24,8 @@ ROBOT_ID = "dsr01"
 ROBOT_MODEL = "m0609"
 VELOCITY, ACC = 60, 60
 
+ON, OFF = 1, 0
+
 def load_yaml(POSE_PATH):
     with open(POSE_PATH, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -45,11 +47,6 @@ def get_recipes(node, poses):
             PourAction(node, poses=poses["pour"], ingredient="blue_juice", amount=30, target="glass"),
             StirAction(node, poses['stir']), # stir
             GarnishAction(node, poses=poses["garnish"], topping="cherry")
-        ],
-        'test': [
-            # PourAction(node, ingredient="tequila", amount=50, target="shaker", pour_pose=poses["pour"]),
-            # PourAction(node, ingredient="shaker_", amount=50, target="shaker_glass", pour_pose=poses["pour"])
-            StirAction(node, poses['stir']), # stir
         ]
     }
 
@@ -67,7 +64,8 @@ def recursive_check(data_dict):
             raise IndexError(f"값 개수 오류 ({len(data_dict)}개): {data_dict}")
         else:
             raise TypeError(f"값 개수와 타입 모두 문제: {data_dict}")
-        
+
+
 def main():
     rclpy.init()
     node = rclpy.create_node("main", namespace=ROBOT_ID)
@@ -76,6 +74,7 @@ def main():
     try:
         from DSR_ROBOT2 import (
             movej,
+            set_digital_output,
             set_tool,
             set_tcp,
             set_ref_coord,
@@ -111,6 +110,8 @@ def main():
             return
 
         def run_actions():
+            movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
+            release(0)
             app.set_status_msg(f"[{recipe_name}] 제조 시작!")
             stop_flag.clear()
             for idx, action in enumerate(recipes[recipe_name], 1):
@@ -125,8 +126,22 @@ def main():
                 time.sleep(0.2)
             else:
                 app.set_status_msg(f"[{recipe_name}] 제조 완료!")
+            movej([0,0,90,0,90,0], vel=VELOCITY, acc=ACC)
+            release(0)
         action_thread = threading.Thread(target=run_actions, daemon=True)
         action_thread.start()
+
+        def release(x):
+            _set_custom_grasp(x)
+            set_digital_output(1, OFF)
+            time.sleep(0.5)
+
+        def _set_custom_grasp(x):
+            if x == 0:
+                set_digital_output(2, OFF)
+            elif x == 1:
+                set_digital_output(2, ON)
+            
 
     app = BartenderGUI(gui_recipes, recipes, robot_action_callback=robot_action_callback)
     app.mainloop()

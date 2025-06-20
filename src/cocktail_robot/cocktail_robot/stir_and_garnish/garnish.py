@@ -6,7 +6,7 @@ from ..utils.base_action import BaseAction
 
 
 ON, OFF = 1, 0
-VELOCITY, ACCURACY = 70, 60
+VELOCITY, ACCURACY = 100, 60
 ### 힘 제어 : BASE 좌표계 기준
 class GarnishAction(BaseAction):
     def __init__(self, node, poses, topping):
@@ -37,6 +37,7 @@ class GarnishAction(BaseAction):
         DR.movel(self.garnish_pose[f"{self.topping}"]["task"], vel=VELOCITY, acc=ACCURACY)
 
         self.grasp(self.grasp_option)
+        time.sleep(0.8)
         DR.movel(self.garnish_pose["garnish_drop_ready"]["task"], vel=VELOCITY, acc=ACCURACY)
         DR.movel(self.garnish_pose["garnish_drop"]["task"], vel=VELOCITY, acc=ACCURACY)
         self.release(self.grasp_option)

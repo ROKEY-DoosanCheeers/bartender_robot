@@ -31,7 +31,7 @@ class ShakerAction(BaseAction):
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC,ref=DR.DR_BASE)
     
-        # DR.move_periodic([100, 100, 0, 0, 0, 45], [1,1.5, 0, 0, 0, 2],repeat=10,atime=0.1,ref=DR.DR_TOOL)
+        DR.move_periodic([100, 100, 0, 0, 0, 0], [2, 3, 0, 0, 0, 0],repeat=10,atime=0.1,ref=DR.DR_TOOL)
         # 2. 충돌 방지 경로
         for _ in range(10):
             moving_pose = [0,60,40,0,35,0]
@@ -40,14 +40,6 @@ class ShakerAction(BaseAction):
             DR.wait(0.45)
             DR.amovej(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
             DR.wait(0.45)
-
-        # for _ in range(10):
-        #     moving_pose = [0,60,40,0,35,0]
-        #     moving_pose1 = [0,-60,-40,0,-35,0]
-        #     DR.amovesx(moving_pose1,vel=250,acc=120,mod=DR.DR_MV_MOD_REL)
-        #     DR.wait(0.45)
-        #     DR.amovesx(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
-        #     DR.wait(0.45)
 
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC)
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)

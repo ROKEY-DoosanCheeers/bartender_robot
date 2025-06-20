@@ -4,7 +4,7 @@ import DR_init
 from ..utils.base_action import BaseAction
 
 
-VELOCITY, ACCURACY = 90, 60
+VELOCITY, ACCURACY = 100, 60
 ON, OFF = 1, 0
 DR = None
 
@@ -54,8 +54,8 @@ class PourAction:
 
             # pour
             DR.movel(self.pour_pose["shaker_glass"]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
-            DR.movel(self.pour_pose["shaker_glass"]["start"]["task"], vel=VELOCITY*0.2, acc = ACCURACY)
-            time.sleep(0.5)
+            DR.movel(self.pour_pose["shaker_glass"]["start"]["task"], vel=VELOCITY*0.15, acc = ACCURACY)
+            time.sleep(1.5)
             DR.movel(self.pour_pose["shaker_glass"]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
 
             # go to place
@@ -68,24 +68,24 @@ class PourAction:
 
 
         else:
-            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.35, acc = ACCURACY,sol=7)
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.4, acc = ACCURACY,sol=7)
 
             DR.movel(pick_before, vel=VELOCITY, acc=ACCURACY)
             DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
             self.grasp(self.grasp_option)
             DR.movel(pick_before, vel=VELOCITY, acc=ACCURACY)
-            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.35, acc = ACCURACY,sol=7)
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.3, acc = ACCURACY,sol=7)
             DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
 
             # pour
             DR.movel(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
-            DR.movel(self.pour_pose[self.target]["start"]["task"], vel=VELOCITY*0.3, acc = ACCURACY)
-            time.sleep(0.5)
+            DR.movel(self.pour_pose[self.target]["start"]["task"], vel=VELOCITY*0.15, acc = ACCURACY)
+            time.sleep(1.5)
             DR.movel(self.pour_pose[self.target]["ready"]["task"], vel=VELOCITY, acc = ACCURACY)
 
             # go to place
             DR.movel(self.pour_pose["pick3"]["task"], vel=VELOCITY, acc = ACCURACY)
-            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.4, acc = ACCURACY,sol=7)
+            DR.movejx(self.pour_pose["pick_back"]["task"], vel=VELOCITY*0.3, acc = ACCURACY,sol=7)
             DR.movel(pick_before,vel=VELOCITY,acc=ACCURACY)
             DR.movel(self.pour_pose[self.ingredient]["task"], vel=VELOCITY, acc = ACCURACY)
             self.release(self.grasp_option)
