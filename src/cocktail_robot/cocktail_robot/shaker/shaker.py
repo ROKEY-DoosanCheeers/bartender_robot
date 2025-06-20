@@ -31,24 +31,30 @@ class ShakerAction(BaseAction):
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC,ref=DR.DR_BASE)
     
-        # DR.move_periodic([100, 100, 0, 0, 0, 45], [1,1.5, 0, 0, 0, 2],repeat=10,atime=0.1,ref=DR.DR_TOOL)
+        pos1 = DR.get_current_posj().copy()
+        qlist = [DR.posj(20.28,-6.19,55.16,12.27,38.84,-166.27),
+                 DR.posj(18.92,-8.32,81.26,6.07,44.71,-158.54),
+                 DR.posj(-36.67,-8.15,58.66,12.45,34.93,-24.48),
+                 DR.posj(-16.30,-10.84,94.22,12.44,36.81,-61.21),
+                 DR.posj(pos1)]
+        
+        for _ in range(4):
+            DR.movesj(qlist,vel=250,acc=150)
+
+        # DR.move_periodic([50, 50, 20, 0, 20, 15], [1,2.5, 1.5, 0, 1.5, 2],repeat=10,atime=0.1,ref=DR.DR_TOOL)
         # 2. 충돌 방지 경로
-        for _ in range(10):
+        for _ in range(4):
             moving_pose = [0,60,40,0,35,0]
             moving_pose1 = [0,-60,-40,0,-35,0]
             DR.amovej(moving_pose1,vel=250,acc=120,mod=DR.DR_MV_MOD_REL)
             DR.wait(0.45)
             DR.amovej(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
             DR.wait(0.45)
-
-        # for _ in range(10):
-        #     moving_pose = [0,60,40,0,35,0]
-        #     moving_pose1 = [0,-60,-40,0,-35,0]
-        #     DR.amovesx(moving_pose1,vel=250,acc=120,mod=DR.DR_MV_MOD_REL)
-        #     DR.wait(0.45)
-        #     DR.amovesx(moving_pose,vel=120,acc=120,mod=DR.DR_MV_MOD_REL) 
-        #     DR.wait(0.45)
-
+        # 옆으로 흔들기
+        # for _ in range(4):
+        #     DR.movejx(shaking_poses['task'],vel=VEL,acc=ACC,ref=DR.DR_BASE,sol=7)
+        #     DR.movejx(shaking_poses['task'],vel=VEL,acc=ACC,ref=DR.DR_BASE,sol=2)
+        
         DR.movel(shaking_poses['task'],vel=VEL,acc=ACC)
         DR.movel(place_before_poses['task'],vel=VEL,acc=ACC)
         # 3. 내려놓기
